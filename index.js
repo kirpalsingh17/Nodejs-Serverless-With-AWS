@@ -33,20 +33,4 @@ app.get("/", async (req, res) => {
   });
 });
 
-// app.listen(port, host, () => {
-//   console.log(`Example app listening on port ${port}`);
-// });
-// ngrok.connect(
-//   {
-//     proto: "http",
-//     addr: port,
-//   },
-//   (err, url) => {
-//     if (err) {
-//       console.error("Error while connecting Ngrok", err);
-//       return new Error("Ngrok Failed");
-//     }
-//   }
-// );
-
 module.exports= app;
