@@ -1,0 +1,63 @@
+service: Shopify-Frontend-App
+frameworkVersion: '3'
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
+useDotenv: true
+
+provider: 
+  name: aws
+  runtime: nodejs16.x
+  region: ${env:REGION}
+  memorySize: 1024
+  timeout: 30
+  
+  httpApi:
+    cors:
+      allowedOrigins: ${env:ALLOW_ORI}
+
+functions:
+  customer:
+    handler: lambda/customer.customerCheck
+    events:
+      - httpApi:
+          method: POST
+          path: /customer
+
+
+  customerTagUpdate:
+    handler: lambda/customer.customerTagUpdate
+    events:
+      - httpApi:
+          method: POST
+          path: /updatectag
+  
+  orderTagUpdate:
+    handler: lambda/order.orderTagUpdate
+    events:
+      - httpApi:
+          method: POST
+          path: /updateordertag
+
+  updateProduct:
+    handler: lambda/productInventory.updateProduct
+    
+    
+  productCreateUpdate:
+    handler: lambda/product.createProduct
+    events:
+      - eventBridge:
+          eventBus: ${env:SHOPIFY_EVENT_BUS}
+          pattern:
+            detail-type:
+              - shopifyWebhook
+            detail:
+              metadata:
+                X-Shopify-Topic:
+                  - prefix: products
+          retryPolicy:
+            maximumEventAge: 3600
+            maximumRetryAttempts: ${env:MESSAGE_RETRY_ATTEMPTS}
+      - http:
+          path: product/create
+          method: post
